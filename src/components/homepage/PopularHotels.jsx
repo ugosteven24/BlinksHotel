@@ -554,7 +554,7 @@ export default function PopularHotels() {
                     <img
                       src={hotel.image}
                       alt={hotel.name}
-                      className="resort-image"
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
                   ) : (
