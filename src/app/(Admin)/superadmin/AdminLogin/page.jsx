@@ -1,6 +1,6 @@
 "use client";
 
-import "../../../style/superadmin/login.css";
+
 
 import Link from "next/link";
 import { useState } from "react";
