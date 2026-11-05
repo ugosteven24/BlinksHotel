@@ -1,6 +1,6 @@
 "use client";
 
-import "../login/auth.css";
+
 
 import { useState } from "react";
 import Link from "next/link";
