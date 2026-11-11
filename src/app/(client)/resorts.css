@@ -779,8 +779,7 @@
 
 @media (max-width: 600px) {
     .resorts-header {
-        gap: 10px;
-        padding: 12px 4%;
+       
     }
 
     .resorts-brand strong {
@@ -986,4 +985,3 @@ button.signin-link {
     font-family: inherit;
     cursor: pointer;
 }
-
