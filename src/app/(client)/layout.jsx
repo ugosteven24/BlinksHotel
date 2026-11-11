@@ -26,26 +26,31 @@ export default async function ClientLayout({ children }) {
   const headerList = await headers();
   const pathname = headerList.get("x-pathname") ?? "";
 
+  // Read the authenticated user from the server session.
   const userId = await getUserId();
 
   const GUEST_ONLY_PATHS = ["/", "/login", "/register"];
 
-  if (GUEST_ONLY_PATHS.includes(pathname) && userId) {
+  const isGuestOnlyPage = GUEST_ONLY_PATHS.includes(pathname);
+
+  // Authenticated users should not visit guest-only pages.
+  if (userId && isGuestOnlyPage) {
     redirect("/dashboard");
+  }
+
+  // Unauthenticated users cannot access dashboard pages.
+  if (!userId && !isGuestOnlyPage) {
+    redirect("/login");
   }
 
   return (
     <div
       className={`${jakartaSans.variable} ${robotoMono.variable} resorts-page`}
     >
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-      />
-
-      {userId ? <ClientMenu /> : <GuestMenu />}
-
-      <main>{children}</main>
+      <main>
+        {userId ? <ClientMenu /> : <GuestMenu />}
+        {children}
+      </main>
 
       <Footer />
     </div>

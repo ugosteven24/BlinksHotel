@@ -5,7 +5,6 @@ import "@/style/superadmin/login.css";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
 
@@ -51,9 +50,7 @@ export default function LoginPage() {
         confirmButtonColor: BUTTON_COLOR,
       });
 
-      setTimeout(() => {
-        router.push("/superadmin");
-      }, 3000);
+      router.push("/superadmin");
 
     } catch (err) {
       switch (err.code) {

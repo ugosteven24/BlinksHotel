@@ -29,6 +29,7 @@ import {
 import PopularDestinations from "@/components/homepage/PopularDestinations";
 import PopularHotels from "@/components/homepage/PopularHotels";
 import Accountintro from "@/components/homepage/Accountintro";
+import HotelsDestinations from "@/components/homepage/hotelsDestinations";
 
 const amenityIcons = {
   Pool: Waves,
@@ -555,6 +556,7 @@ export default function ResortsPage() {
           </section>
         ) : (
           <>
+            <HotelsDestinations />
             <PopularDestinations />
             <Accountintro />
             <PopularHotels />

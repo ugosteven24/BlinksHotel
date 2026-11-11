@@ -1,9 +1,13 @@
+
 import "../global.css";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import Menu from "@/components/superadmin/layout/menu";
-
-
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import AdminAuthGuard from "./AdminAuthGuard";
+import { auth, db } from "@/firebase/firebase";
+import { redirect } from "next/navigation";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -19,7 +23,12 @@ export const metadata = {
   description: "Book your perfect stay with us",
 };
 
-export default function AdminLayout({ children }) {
+export default async function AdminLayout({ children }) {
+  // If the user is not logged in, redirect to the login page
+
+
+
+
   return (
     <html
       lang="en"
@@ -75,8 +84,11 @@ export default function AdminLayout({ children }) {
       </head>
 
       <body>
-      <Menu/>
-        {children}
+        <Menu />
+        <AdminAuthGuard>
+          <Menu />
+          {children}
+        </AdminAuthGuard>
 
         {/* jQuery */}
         <Script

@@ -460,359 +460,382 @@ export default function PopularHotels() {
   // ----------------------------------------
 
   return (
-    <main className="">
+  
+<main className="min-h-screen bg-slate-50">
+    <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-8">
 
-      <div className="resorts-results">
+        {/* RESULTS HEADER */}
+        <div className="mb-8 flex flex-col justify-between gap-6 border-b border-slate-200 pb-7 md:flex-row md:items-end">
 
-        {/* HEADER */}
+            <div>
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-700">
+                    <span className="material-symbols-outlined text-base">
+                        hotel
+                    </span>
+                    Hotel Collection
+                </div>
 
-        <div className="results-heading">
+                <h2 className="text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
+                    Discover Popular Hotels
+                </h2>
 
-          <div>
-            <h2>Popular Hotels</h2>
+                <p className="mt-2 text-sm font-medium text-slate-500">
+                    Explore exceptional stays and find the perfect place for your next journey.
+                </p>
 
-            <p>
-              Showing {filteredHotels.length} of {hotels.length} loaded hotels
-            </p>
-          </div>
+                <p className="mt-3 text-sm font-semibold text-slate-700">
+                    Showing <span className="text-blue-700">{filteredHotels.length}</span> of {hotels.length} loaded hotels
+                </p>
+            </div>
 
-          <label className="sort-control">
-            <span>Sort by:</span>
+            {/* SORT */}
+            <label className="flex min-w-[220px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm transition focus-within:border-blue-500">
+                <span className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                    Sort by
+                </span>
 
-            <select
-              value={sortBy}
-              onChange={(event) =>
-                setSortBy(event.target.value)
-              }
-            >
-              <option value="popular">Popularity</option>
-              <option value="featured">Featured</option>
-              <option value="rating">Highest Rated</option>
-              <option value="price-low">
-                Price: Low to High
-              </option>
-              <option value="price-high">
-                Price: High to Low
-              </option>
-            </select>
+                <select
+                    value={sortBy}
+                    onChange={(event) => setSortBy(event.target.value)}
+                    className="min-w-0 flex-1 cursor-pointer bg-transparent text-sm font-bold text-slate-800 outline-none"
+                >
+                    <option value="popular">Popularity</option>
+                    <option value="featured">Featured</option>
+                    <option value="rating">Highest Rated</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                </select>
 
-            <ChevronDown size={15} />
-          </label>
-
+                <ChevronDown size={16} className="text-slate-400" />
+            </label>
         </div>
 
         {/* SEARCH */}
+        <div className="mb-9">
+            <div className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm transition-all duration-200 focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10">
+                <Search size={21} className="shrink-0 text-slate-400 transition group-focus-within:text-blue-600" />
 
+                <input
+                    className="w-full bg-transparent text-sm font-medium text-slate-800 outline-none placeholder:font-normal placeholder:text-slate-400"
+                    type="text"
+                    placeholder="Search hotels, cities, destinations or locations..."
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                />
 
-
-        <input
-          className="hotel-search-input py-14"
-          type="text"
-          placeholder="Search hotel, city or location..."
-          value={searchTerm}
-          onChange={(event) =>
-            setSearchTerm(event.target.value)
-          }
-        />
-
+                {searchTerm && (
+                    <button
+                        type="button"
+                        onClick={clearFilters}
+                        className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50"
+                    >
+                        Clear
+                    </button>
+                )}
+            </div>
+        </div>
 
         {/* INITIAL LOADING */}
-
         {loading && hotels.length === 0 ? (
-          <div className="destination-loading-inline ">
-            <div className="destination-spinner" />
-            <p>Loading hotels...</p>
-          </div>
-        ) : error && hotels.length === 0 ? (
-          <div className="no-resorts">
-            <h3>Unable to load hotels</h3>
-            <p>{error}</p>
+            <div className="flex flex-col items-center justify-center py-24">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
+                <p className="mt-4 text-sm font-semibold text-slate-500">
+                    Discovering available hotels...
+                </p>
+            </div>
 
-            <button
-              type="button"
-              className="view-details-button"
-              onClick={retryLoading}
-            >
-              Try again
-            </button>
-          </div>
+        ) : error && hotels.length === 0 ? (
+            <div className="rounded-2xl border border-red-100 bg-white px-6 py-16 text-center shadow-sm">
+                <h3 className="text-xl font-bold text-slate-900">
+                    Unable to load hotels
+                </h3>
+                <p className="mt-2 text-sm text-slate-500">{error}</p>
+
+                <button
+                    type="button"
+                    className="mt-6 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
+                    onClick={retryLoading}
+                >
+                    Try again
+                </button>
+            </div>
+
         ) : filteredHotels.length > 0 ? (
 
-          /* HOTEL GRID */
+            /* HOTEL GRID */
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
 
-          <div className="resorts-grid">
-
-            {filteredHotels.map((hotel) => (
-              <article
-                className="resort-card"
-                key={hotel.id}
-              >
-
-                <div className="resort-image-wrap">
-
-                  {hotel.image ? (
-                    <img
-                      src={hotel.image}
-                      alt={hotel.name}
-                      className="resort-image"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="resort-image">
-                      No image available
-                    </div>
-                  )}
-
-                  {hotel.featured && (
-                    <span className="resort-badge popular">
-                      Featured
-                    </span>
-                  )}
-
-                  <button
-                    type="button"
-                    className={`favorite-button ${favorites.includes(hotel.id) ? "is-favorite" : ""
-                      }`}
-                    aria-label={
-                      favorites.includes(hotel.id)
-                        ? "Remove from favorites"
-                        : "Add to favorites"
-                    }
-                    disabled={authLoading || favoriteLoading}
-                    onClick={() => toggleFavorite(hotel)}
-                  >
-                    <Heart
-                      size={19}
-                      fill={
-                        favorites.includes(hotel.id)
-                          ? "currentColor"
-                          : "none"
-                      }
-                    />
-                  </button>
-
-                  {hotel.rating > 0 && (
-                    <span className="image-rating">
-                      <Star
-                        size={13}
-                        fill="currentColor"
-                      />
-
-                      {hotel.rating}
-
-                      <span>
-                        ({hotel.reviews})
-                      </span>
-                    </span>
-                  )}
-
-                </div>
-
-                <div className="resort-card-body">
-
-                  <h3>{hotel.name}</h3>
-
-                  <p className="resort-location">
-                    <MapPin size={14} />
-
-                    {hotel.location || "Location unavailable"}
-
-                    <span>·</span>
-
-                    {hotel.type}
-                  </p>
-
-                  {hotel.verified && (
-                    <span className="hotel-verified">
-                      <ShieldCheck size={14} />
-                      Verified property
-                    </span>
-                  )}
-
-                  <div className="resort-amenities">
-
-                    {hotel.amenities.slice(0, 4).map(
-                      (amenity, index) => {
-                        const Icon =
-                          amenityIcons[amenity] || Waves;
-
-                        return (
-                          <span
-                            key={`${amenity}-${index}`}
-                            title={amenity}
-                          >
-                            <Icon size={14} />
-
-                            {amenity === "Fitness Center"
-                              ? "Fitness"
-                              : amenity}
-                          </span>
-                        );
-                      }
-                    )}
-
-                  </div>
-
-                  <div className="resort-card-bottom">
-
-                    <div className="resort-price">
-                      {/* <strong>
-                          {formatPrice(hotel.price)}
-                        </strong>
-
-                        <span>/ night</span> */}
-                    </div>
-
-                    <Link
-                      href={`/pages/hoteldetails/${encodeURIComponent(
-                        hotel.id
-                      )}`}
-                      className="view-details-button"
+                {filteredHotels.map((hotel) => (
+                    <article
+                        key={hotel.id}
+                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-xl"
                     >
-                      View Details
-                      <ArrowRight size={15} />
-                    </Link>
 
-                  </div>
+                        {/* IMAGE */}
+                        <div className="relative h-[245px] overflow-hidden bg-slate-100">
 
-                </div>
+                            {hotel.image ? (
+                                <img
+                                    src={hotel.image}
+                                    alt={hotel.name}
+                                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    loading="lazy"
+                                />
+                            ) : (
+                                <div className="flex h-full items-center justify-center text-sm font-medium text-slate-400">
+                                    No image available
+                                </div>
+                            )}
 
-              </article>
-            ))}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10" />
 
-          </div>
+                            {/* FEATURED */}
+                            {hotel.featured && (
+                                <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-xs font-extrabold text-slate-900 shadow-lg">
+                                    <Star size={13} className="fill-amber-400 text-amber-400" />
+                                    Featured
+                                </span>
+                            )}
+
+                            {/* FAVORITE */}
+                            <button
+                                type="button"
+                                className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg transition hover:scale-110 ${
+                                    favorites.includes(hotel.id)
+                                        ? "text-red-500"
+                                        : "text-slate-600 hover:text-red-500"
+                                }`}
+                                aria-label={
+                                    favorites.includes(hotel.id)
+                                        ? "Remove from favorites"
+                                        : "Add to favorites"
+                                }
+                                disabled={authLoading || favoriteLoading}
+                                onClick={() => toggleFavorite(hotel)}
+                            >
+                                <Heart
+                                    size={19}
+                                    fill={favorites.includes(hotel.id) ? "currentColor" : "none"}
+                                />
+                            </button>
+
+                            {/* RATING */}
+                            {hotel.rating > 0 && (
+                                <div className="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm font-extrabold text-slate-900 shadow-lg">
+                                    <Star size={14} className="fill-amber-400 text-amber-400" />
+                                    {hotel.rating}
+
+                                    <span className="text-xs font-medium text-slate-400">
+                                        ({hotel.reviews} reviews)
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* CARD CONTENT */}
+                        <div className="p-5">
+
+                            <div className="mb-3">
+                                <h3 className="line-clamp-1 text-xl font-extrabold tracking-tight text-slate-900 transition group-hover:text-blue-700">
+                                    {hotel.name}
+                                </h3>
+
+                                <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-slate-500">
+                                    <MapPin size={15} className="shrink-0 text-blue-600" />
+                                    <span className="truncate">
+                                        {hotel.location || "Location unavailable"}
+                                    </span>
+                                    <span className="text-slate-300">·</span>
+                                    <span className="shrink-0">{hotel.type}</span>
+                                </p>
+                            </div>
+
+                            {/* VERIFIED */}
+                            {hotel.verified && (
+                                <div className="mb-4 inline-flex items-center gap-1.5 rounded-md bg-emerald-50 px-2.5 py-1.5 text-xs font-bold text-emerald-700">
+                                    <ShieldCheck size={14} />
+                                    Verified property
+                                </div>
+                            )}
+
+                            {/* AMENITIES */}
+                            <div className="flex min-h-[54px] flex-wrap content-start gap-2 border-t border-slate-100 py-4">
+                                {hotel.amenities.slice(0, 4).map((amenity, index) => {
+                                    const Icon = amenityIcons[amenity] || Waves;
+
+                                    return (
+                                        <span
+                                            key={`${amenity}-${index}`}
+                                            title={amenity}
+                                            className="inline-flex items-center gap-1.5 rounded-lg bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-600"
+                                        >
+                                            <Icon size={13} className="text-slate-400" />
+
+                                            {amenity === "Fitness Center"
+                                                ? "Fitness"
+                                                : amenity}
+                                        </span>
+                                    );
+                                })}
+                            </div>
+
+                            {/* FOOTER */}
+                            <div className="flex items-center justify-between border-t border-slate-100 pt-4">
+                                <div>
+                                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                        Accommodation
+                                    </span>
+                                    <p className="mt-1 text-sm font-bold text-slate-800">
+                                        View property
+                                    </p>
+                                </div>
+
+                                <Link
+                                    href={`/pages/hoteldetails/${encodeURIComponent(hotel.id)}`}
+                                    className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"
+                                >
+                                    View Details
+                                    <ArrowRight size={16} />
+                                </Link>
+                            </div>
+                        </div>
+                    </article>
+                ))}
+
+            </div>
 
         ) : (
 
-          /* EMPTY STATE */
+            /* EMPTY STATE */
+            <div className="rounded-2xl border border-slate-200 bg-white px-6 py-20 text-center shadow-sm">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                    <Search size={30} />
+                </div>
 
-          <div className="no-resorts">
-            <Search size={34} />
+                <h3 className="mt-5 text-xl font-extrabold text-slate-900">
+                    No hotels found
+                </h3>
 
-            <h3>No hotels found</h3>
+                <p className="mt-2 text-sm text-slate-500">
+                    We couldn't find any properties matching your search.
+                    Try another destination or clear your search.
+                </p>
 
-            <p>
-              Try another search or clear your filters.
-            </p>
-
-            <button
-              type="button"
-              className="view-details-button"
-              onClick={clearFilters}
-            >
-              Clear Search
-            </button>
-          </div>
-
+                <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="mt-6 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-700"
+                >
+                    Clear Search
+                </button>
+            </div>
         )}
 
         {/* INFINITE SCROLL */}
-
-        <div
-          ref={sentinelRef}
-          className="infinite-scroll-trigger"
-        />
+        <div ref={sentinelRef} className="infinite-scroll-trigger" />
 
         {loadingMore && (
-          <div className="destination-loading-inline">
-            <div className="destination-spinner" />
-            <p>Loading more hotels...</p>
-          </div>
+            <div className="flex items-center justify-center gap-3 py-10">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600" />
+                <p className="text-sm font-semibold text-slate-500">
+                    Loading more hotels...
+                </p>
+            </div>
         )}
 
         {error && hotels.length > 0 && (
-          <div className="infinite-scroll-error">
-            <p>{error}</p>
-
-            <button
-              type="button"
-              onClick={retryLoading}
-            >
-              Try again
-            </button>
-          </div>
+            <div className="mt-6 rounded-xl border border-red-100 bg-red-50 p-5 text-center">
+                <p className="text-sm font-medium text-red-600">{error}</p>
+                <button
+                    type="button"
+                    onClick={retryLoading}
+                    className="mt-3 text-sm font-bold text-red-700 underline"
+                >
+                    Try again
+                </button>
+            </div>
         )}
 
         {/* MANUAL FALLBACK */}
-
-
         {!loading && hasMore && (
-          <div className="flex w-full justify-center items-center py-8">
-            <button
-              type="button"
-              disabled={loadingMore}
-              onClick={() => fetchHotels(false)}
-              className="flex items-center justify-center gap-3 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {loadingMore ? (
-                <>
-                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  Loading hotels...
-                </>
-              ) : (
-                "Load More Hotels"
-              )}
-            </button>
-          </div>
+            <div className="flex w-full items-center justify-center py-10">
+                <button
+                    type="button"
+                    disabled={loadingMore}
+                    onClick={() => fetchHotels(false)}
+                    className="flex items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-8 py-3.5 text-sm font-bold text-slate-800 shadow-sm transition hover:border-blue-600 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    {loadingMore ? (
+                        <>
+                            <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600" />
+                            Loading hotels...
+                        </>
+                    ) : (
+                        <>
+                            Load More Hotels
+                            <ArrowRight size={16} />
+                        </>
+                    )}
+                </button>
+            </div>
         )}
-
 
         {!hasMore && hotels.length > 0 && (
-          <p className="end-of-hotels">
-            You have reached the end of the hotels.
-          </p>
+            <p className="py-10 text-center text-sm font-medium text-slate-400">
+                You've explored all available hotels.
+            </p>
         )}
 
-      </div>
-      {/* LOGIN REQUIRED DIALOG */}
+    </div>
 
-      {showLoginDialog && (
-        <div className="favorite-dialog-overlay">
+    {/* LOGIN REQUIRED DIALOG */}
+    {showLoginDialog && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/60 px-4 backdrop-blur-sm">
 
-          <div className="favorite-dialog">
+            <div className="relative w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-2xl">
 
-            <button
-              type="button"
-              className="favorite-dialog-close"
-              onClick={() => setShowLoginDialog(false)}
-              aria-label="Close dialog"
-            >
-              <X size={20} />
-            </button>
+                <button
+                    type="button"
+                    className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
+                    onClick={() => setShowLoginDialog(false)}
+                    aria-label="Close dialog"
+                >
+                    <X size={19} />
+                </button>
 
-            <div className="favorite-dialog-icon">
-              <Heart size={28} />
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+                    <Heart size={28} />
+                </div>
+
+                <h3 className="mt-6 text-2xl font-extrabold tracking-tight text-slate-900">
+                    Save your favourite stays
+                </h3>
+
+                <p className="mt-3 text-sm leading-6 text-slate-500">
+                    Sign in to your HotelReserve account to save hotels,
+                    manage your favourites, and easily find them whenever
+                    you're ready to book.
+                </p>
+
+                <div className="mt-7 flex flex-col gap-3">
+                    <Link
+                        href="/login?redirect=/"
+                        className="flex items-center justify-center rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-blue-700"
+                    >
+                        Sign In
+                    </Link>
+
+                    <Link
+                        href="/register"
+                        className="flex items-center justify-center rounded-xl border border-slate-200 px-6 py-3.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+                    >
+                        Create Account
+                    </Link>
+                </div>
             </div>
-
-            <h3>Sign in to save favorites</h3>
-
-            <p>
-              You need to sign in to your account before
-              you can add hotels to your favorites.
-            </p>
-
-            <div className="favorite-dialog-actions">
-
-              <Link
-                href="/login?redirect=/"
-                className="favorite-login-button"
-              >
-                Sign In
-              </Link>
-
-              <Link
-                href="/register"
-                className="favorite-register-button"
-              >
-                Create Account
-              </Link>
-
-            </div>
-
-          </div>
-
         </div>
-      )}
-    </main>
+    )}
+</main>
+
   );
 }

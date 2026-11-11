@@ -92,6 +92,8 @@ export async function getUserId() {
   return session?.userId ?? null;
 }
 
+
+
 // Remove the session cookie (logout).
 export async function deleteSession() {
   const cookieStore = await cookies();
