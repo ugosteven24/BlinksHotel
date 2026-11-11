@@ -1,11 +1,5 @@
 "use client";
 
-<<<<<<< HEAD:src/app/Adminlogin/page.jsx
-import "@/style/superadmin/login.css";
-=======
-
->>>>>>> 30ba134dd6c97ff9d9b4e1e4e68c091502486425:src/app/(Admin)/superadmin/AdminLogin/page.jsx
-
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
