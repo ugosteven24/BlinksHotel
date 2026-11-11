@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
-
+import { ArrowRight } from "lucide-react";
 export default function PopularDestinations() {
     const [destinations, setDestinations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -107,7 +107,7 @@ export default function PopularDestinations() {
                     <span>Explore all destinations</span>
 
                     <span className="material-symbols-outlined text-[18px]">
-                        arrow_forward
+                       <ArrowRight size={20} />
                     </span>
                 </Link>
             </div>
@@ -145,27 +145,38 @@ export default function PopularDestinations() {
                 </div>
             )}
 
-            {/* Overlapping destination cards */}
 
-            {/* Destination cards */}
+            {/* Overlapping destination cards — all screen sizes */}
             {!loading && !error && destinations.length > 0 && (
-                <>
-                    {/* Mobile: vertical cards */}
+                <div className="relative h-[240px] w-full sm:h-[300px] md:h-[360px]">
+                    {destinations.map((destination, index) => {
+                        const cardWidth =
+                            destinations.length === 1 ? 100 : 64;
 
-                    {/* Mobile: 2-column destination grid */}
-                    <div className="grid grid-cols-2 gap-3 md:hidden">
-                        {destinations.map((destination) => (
+                        const leftPosition =
+                            destinations.length === 1
+                                ? 0
+                                : (index / (destinations.length - 1)) *
+                                (100 - cardWidth);
+
+                        return (
                             <Link
                                 key={destination.city.toLowerCase()}
-                                href={`/search?destinationdetails=${encodeURIComponent(
+                                href={`/pages/destinationdetails?destination=${encodeURIComponent(
                                     destination.city
                                 )}`}
-                                className="group relative h-52 overflow-hidden rounded-xl shadow-md"
+                                aria-label={`Explore ${destination.city}, ${destination.length} hotels`}
+                                className="group absolute inset-y-0 overflow-hidden rounded-xl border-2 border-white bg-surface-container shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl sm:rounded-2xl"
+                                style={{
+                                    left: `${leftPosition}%`,
+                                    width: `${cardWidth}%`,
+                                    zIndex: index + 1,
+                                }}
                             >
                                 {/* Cover image */}
                                 {destination.coverImage && (
                                     <div
-                                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                                         style={{
                                             backgroundImage: `url("${destination.coverImage}")`,
                                         }}
@@ -173,127 +184,34 @@ export default function PopularDestinations() {
                                 )}
 
                                 {/* Gradient overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
 
-                                {/* Hotel count: top-left */}
-                                <div className="absolute left-2 top-2 z-10 rounded-full bg-white/95 px-2 py-1 text-[11px] font-semibold text-gray-900 shadow">
+                                {/* Hotel count */}
+                                <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[10px] font-semibold text-gray-900 shadow-md sm:left-4 sm:top-4 sm:px-3 sm:py-1.5 sm:text-sm">
+                                    <span className="material-symbols-outlined text-xs sm:text-base">
+                                        apartment
+                                    </span>
+
                                     {destination.length}{" "}
                                     {destination.length === 1 ? "Hotel" : "Hotels"}
                                 </div>
 
-                                {/* City name */}
-                                <div className="absolute bottom-4 left-3 right-2 z-10">
-                                    <h3 className="text-lg font-bold leading-tight text-white">
+                                {/* Destination details */}
+                                <div className="absolute bottom-4 left-3 right-2 z-10 sm:bottom-7 sm:left-6 sm:right-4">
+                                    <h3 className="text-base font-bold leading-tight text-white sm:text-2xl">
                                         {destination.city}
                                     </h3>
 
-                                    <p className="mt-1 text-xs text-white/80">
-                                        Explore stays
-                                    </p>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-
-
-                    {/* Tablet: two-column grid */}
-                    <div className="hidden grid-cols-2 gap-5 md:grid lg:hidden">
-                        {destinations.map((destination) => (
-                            <Link
-                                key={destination.city.toLowerCase()}
-                                href={`/pages/destinationdetails?destination=${encodeURIComponent(
-                                    destination.city
-                                )}`}
-                                className="group relative h-64 overflow-hidden rounded-2xl shadow-md"
-                            >
-                                {destination.coverImage && (
-                                    <div
-                                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                                        style={{
-                                            backgroundImage: `url("${destination.coverImage}")`,
-                                        }}
-                                    />
-                                )}
-
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-
-                                <div className="absolute left-4 top-4 z-10 rounded-full bg-white/95 px-3 py-1.5 text-sm font-semibold text-gray-900 shadow-md">
-                                    {destination.length}{" "}
-                                    {destination.length === 1 ? "Hotel" : "Hotels"}
-                                </div>
-
-                                <div className="absolute bottom-6 left-5 z-10">
-                                    <h3 className="text-2xl font-bold text-white">
-                                        {destination.city}
-                                    </h3>
-                                    <p className="mt-1 text-sm text-white/80">
+                                    <p className="mt-1 text-[10px] text-white/80 sm:text-sm">
                                         Explore stays in {destination.city}
                                     </p>
                                 </div>
                             </Link>
-                        ))}
-                    </div>
-
-                    {/* Desktop: overlapping cards */}
-                    <div className="relative hidden h-[360px] w-full lg:block">
-                        {destinations.map((destination, index) => {
-                            const cardWidth =
-                                destinations.length === 1 ? 100 : 64;
-
-                            const leftPosition =
-                                destinations.length === 1
-                                    ? 0
-                                    : (index / (destinations.length - 1)) *
-                                    (100 - cardWidth);
-
-                            return (
-                                <Link
-                                    key={destination.city.toLowerCase()}
-                                    href={`/pages/destinationdetails?destination=${encodeURIComponent(
-                                        destination.city
-                                    )}`}
-                                    aria-label={`Explore ${destination.city}, ${destination.length} hotels`}
-                                    className="group absolute inset-y-0 overflow-hidden rounded-2xl border-2 border-white bg-surface-container shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
-                                    style={{
-                                        left: `${leftPosition}%`,
-                                        width: `${cardWidth}%`,
-                                        zIndex: index + 1,
-                                    }}
-                                >
-                                    {destination.coverImage && (
-                                        <div
-                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-                                            style={{
-                                                backgroundImage: `url("${destination.coverImage}")`,
-                                            }}
-                                        />
-                                    )}
-
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-
-                                    {/* Hotel count: top-left */}
-                                    <div className="absolute left-4 top-4 z-10 flex items-center gap-1 rounded-full bg-white/95 px-3 py-1.5 text-sm font-semibold text-gray-900 shadow-md">
-                                        <span className="material-symbols-outlined text-base">
-                                            apartment
-                                        </span>
-                                        {destination.length}{" "}
-                                        {destination.length === 1 ? "Hotel" : "Hotels"}
-                                    </div>
-
-                                    <div className="absolute bottom-7 left-6 right-4 z-10">
-                                        <h3 className="text-2xl font-bold text-white">
-                                            {destination.city}
-                                        </h3>
-                                        <p className="mt-1 text-sm text-white/80">
-                                            Explore stays in {destination.city}
-                                        </p>
-                                    </div>
-                                </Link>
-                            );
-                        })}
-                    </div>
-                </>
+                        );
+                    })}
+                </div>
             )}
+
 
         </section>
     );

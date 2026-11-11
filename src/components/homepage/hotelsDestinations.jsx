@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebase";
-
+import { ArrowRight } from "lucide-react";
 export default function hotelsDestinations() {
     const [destinations, setDestinations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -115,7 +115,7 @@ export default function hotelsDestinations() {
                 <span>Explore all destinations</span>
 
                 <span className="material-symbols-outlined text-[18px]">
-                    arrow_forward
+                    <ArrowRight size={20} />
                 </span>
             </Link>
     

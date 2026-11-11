@@ -369,7 +369,7 @@ export default function ResortsPage() {
               </>
             ) : (
               <>
-                <Search size={18} />
+               
                 Search Resorts
               </>
             )}
