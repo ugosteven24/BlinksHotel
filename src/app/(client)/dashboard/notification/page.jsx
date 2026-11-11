@@ -1,34 +1,7 @@
-
 "use client";
 
-import { useMemo, useState,useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  Search,
-  MapPin,
-  CalendarDays,
-  Users,
-  Heart,
-  SlidersHorizontal,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ArrowRight,
-  Waves,
-  Wifi,
-  Utensils,
-  Dumbbell,
-  ShieldCheck,
-  Headset,
-  Star,
-  Menu,
-  X,
-} from "lucide-react";
-import ProfileImage from "../component/profileImage";
-import "./resorts.css";
-
-
-
 import {
   collection,
   doc,
@@ -40,26 +13,40 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebase/firebase";
+import "./resorts.css";
 
+const categoryDefinitions = [
+  { id: "all", label: "All Alerts", icon: "inbox" },
+  { id: "booking", label: "Booking Updates", icon: "calendar_today" },
+  {
+    id: "security",
+    label: "Account Security",
+    icon: "security",
+    danger: true,
+  },
+  { id: "offers", label: "Personalized Offers", icon: "sell" },
+  { id: "account", label: "Account", icon: "account_circle" },
+];
 
 function toDate(value) {
   if (!value) return null;
 
   if (typeof value?.toDate === "function") {
-    return value.toDate();
+    const converted = value.toDate();
+    return converted instanceof Date && !Number.isNaN(converted.getTime())
+      ? converted
+      : null;
   }
 
   const date = value instanceof Date ? value : new Date(value);
-
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
 function formatRelativeTime(value) {
   const date = toDate(value);
-
   if (!date) return "Recently";
 
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
 
   if (seconds < 60) return "Just now";
 
@@ -76,287 +63,73 @@ function formatRelativeTime(value) {
   return date.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
-    year: date.getFullYear() !== new Date().getFullYear()
-      ? "numeric"
-      : undefined,
+    year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
   });
 }
 
 function normalizeNotification(id, data) {
+  const createdAt = toDate(data.createdAt ?? data.timestamp);
+
   return {
     id,
     category: data.category ?? "account",
     title: data.title ?? "Notification",
     message: data.message ?? "",
-    time: formatRelativeTime(data.createdAt ?? data.timestamp),
-    createdAt: toDate(data.createdAt ?? data.timestamp),
+    time: formatRelativeTime(createdAt),
+    createdAt,
     icon: data.icon ?? "notifications",
     type: data.type ?? "general",
-    unread: !(data.read ?? !data.unread),
+    // Prefer the explicit read field; fall back to the legacy unread field.
+    unread:
+      typeof data.read === "boolean"
+        ? !data.read
+        : Boolean(data.unread),
     action: data.action ?? null,
     actionUrl: data.actionUrl ?? data.link ?? null,
   };
 }
 
-const categoryDefinitions = [
-  { id: "all", label: "All Alerts", icon: "inbox" },
-  { id: "booking", label: "Booking Updates", icon: "calendar_today" },
-  {
-    id: "security",
-    label: "Account Security",
-    icon: "security",
-    danger: true,
-  },
-  { id: "offers", label: "Personalized Offers", icon: "sell" },
-  { id: "account", label: "Account", icon: "account_circle" },
-];
-const resorts = [
-  {
-    id: 1,
-    name: "Maldives Island Resort",
-    location: "Maldives",
-    country: "Maldives",
-    type: "Beach Resort",
-    price: 450,
-    rating: 4.8,
-    reviews: 124,
-    badge: "Popular",
-    badgeType: "popular",
-    amenities: ["Pool", "Spa", "WiFi", "Restaurant", "Beach Access"],
-    image:
-      "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=1000&q=85",
-  },
-  {
-    id: 2,
-    name: "Santorini Cliff Resort",
-    location: "Santorini, Greece",
-    country: "Greece",
-    type: "Beach Resort",
-    price: 320,
-    rating: 4.6,
-    reviews: 98,
-    badge: "Best Value",
-    badgeType: "value",
-    amenities: ["Pool", "Spa", "WiFi", "Restaurant"],
-    image:
-      "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1000&q=85",
-  },
-  {
-    id: 3,
-    name: "Bali Beach Resort & Spa",
-    location: "Bali, Indonesia",
-    country: "Indonesia",
-    type: "Beach Resort",
-    price: 280,
-    rating: 4.9,
-    reviews: 176,
-    badge: "Luxury",
-    badgeType: "luxury",
-    amenities: ["Pool", "Spa", "WiFi", "Restaurant", "Beach Access"],
-    image:
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1000&q=85",
-  },
-  {
-    id: 4,
-    name: "Lake Como Resort",
-    location: "Lake Como, Italy",
-    country: "Italy",
-    type: "Mountain Resort",
-    price: 390,
-    rating: 4.5,
-    reviews: 87,
-    badge: "Trending",
-    badgeType: "trending",
-    amenities: ["Pool", "Spa", "WiFi", "Restaurant", "Beach Access"],
-    image:
-      "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=85",
-  },
-  {
-    id: 5,
-    name: "Phuket Island Resort",
-    location: "Phuket, Thailand",
-    country: "Thailand",
-    type: "Island Resort",
-    price: 260,
-    rating: 4.7,
-    reviews: 112,
-    badge: "Family Friendly",
-    badgeType: "family",
-    amenities: ["Pool", "Spa", "WiFi", "Restaurant", "Fitness Center"],
-    image:
-      "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1000&q=85",
-  },
-  {
-    id: 6,
-    name: "Seychelles Resort & Spa",
-    location: "Seychelles",
-    country: "Seychelles",
-    type: "Beach Resort",
-    price: 520,
-    rating: 4.8,
-    reviews: 143,
-    badge: "Romantic",
-    badgeType: "romantic",
-    amenities: ["Pool", "Spa", "WiFi", "Restaurant", "Beach Access"],
-    image:
-      "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?auto=format&fit=crop&w=1000&q=85",
-  },
-];
-
-const resortTypes = [
-  "Beach Resort",
-  "Mountain Resort",
-  "Island Resort",
-  "All-Inclusive",
-  "Wellness Resort",
-  "Family Resort",
-];
-
-const amenityOptions = [
-  { label: "Swimming Pool", value: "Pool" },
-  { label: "Spa & Wellness", value: "Spa" },
-  { label: "Free WiFi", value: "WiFi" },
-  { label: "Restaurant", value: "Restaurant" },
-  { label: "Fitness Center", value: "Fitness Center" },
-  { label: "Beach Access", value: "Beach Access" },
-];
-
-const amenityIcons = {
-  Pool: Waves,
-  Spa: Waves,
-  WiFi: Wifi,
-  Restaurant: Utensils,
-  "Fitness Center": Dumbbell,
-  "Beach Access": Waves,
-};
-
-export default function ResortsPage() {
-  const [destination, setDestination] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState("2 Adults, 0 Children");
-
-  const [maxPrice, setMaxPrice] = useState(1000);
-  const [ratings, setRatings] = useState([5]);
-  const [types, setTypes] = useState(["Beach Resort"]);
-  const [amenities, setAmenities] = useState([
-    "Pool",
-    "WiFi",
-  ]);
-
-  const [sortBy, setSortBy] = useState("popular");
-  const [favorites, setFavorites] = useState([]);
-  const [page, setPage] = useState(1);
-  const [mobileFiltersOpen, setMobileFiltersOpen] =
-    useState(false);
-
-  const pageSize = 6;
-
-  const filteredResorts = useMemo(() => {
-    let result = resorts.filter((resort) => {
-      const term = searchTerm.trim().toLowerCase();
-
-      const matchesDestination =
-        !term ||
-        resort.name.toLowerCase().includes(term) ||
-        resort.location.toLowerCase().includes(term) ||
-        resort.country.toLowerCase().includes(term);
-
-      const matchesPrice = resort.price <= maxPrice;
-
-      const matchesRating =
-        ratings.length === 0 ||
-        ratings.some((rating) => resort.rating >= rating - 0.9);
-
-      const matchesType =
-        types.length === 0 ||
-        types.includes(resort.type);
-
-      const matchesAmenities = amenities.every((amenity) =>
-        resort.amenities.includes(amenity)
-      );
-
-      return (
-        matchesDestination &&
-        matchesPrice &&
-        matchesRating &&
-        matchesType &&
-        matchesAmenities
-      );
-    });
-
-    if (sortBy === "price-low") {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortBy === "price-high") {
-      result.sort((a, b) => b.price - a.price);
-    } else if (sortBy === "rating") {
-      result.sort((a, b) => b.rating - a.rating);
-    } else {
-      result.sort((a, b) => b.reviews - a.reviews);
-    }
-
-    return result;
-  }, [searchTerm, maxPrice, ratings, types, amenities, sortBy]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredResorts.length / pageSize)
+function isSameCalendarDay(first, second) {
+  return (
+    first.getFullYear() === second.getFullYear() &&
+    first.getMonth() === second.getMonth() &&
+    first.getDate() === second.getDate()
   );
+}
 
-  const visibleResorts = filteredResorts.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+function getSafeActionUrl(value) {
+  if (typeof value !== "string" || !value.trim()) return null;
 
-  function toggleValue(value, values, setValues) {
-    setValues(
-      values.includes(value)
-        ? values.filter((item) => item !== value)
-        : [...values, value]
-    );
-    setPage(1);
-  }
+  const url = value.trim();
 
-  function handleSearch(event) {
-    event.preventDefault();
-    setSearchTerm(destination);
-    setPage(1);
-  }
+  // Notification actions should navigate within this application.
+  // Reject protocol-relative URLs and non-root-relative paths.
+  if (!url.startsWith("/") || url.startsWith("//")) return null;
 
-  function clearFilters() {
-    setMaxPrice(1000);
-    setRatings([]);
-    setTypes([]);
-    setAmenities([]);
-    setDestination("");
-    setSearchTerm("");
-    setPage(1);
-  }
+  return url;
+}
 
-  function toggleFavorite(id) {
-    setFavorites((previous) =>
-      previous.includes(id)
-        ? previous.filter((item) => item !== id)
-        : [...previous, id]
-    );
-  }
-const [activeCategory, setActiveCategory] = useState("all");
+export default function NotificationsPage() {
+  const [activeCategory, setActiveCategory] = useState("all");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [userId, setUserId] = useState(null);
   const [markingAll, setMarkingAll] = useState(false);
+  const [updatingIds, setUpdatingIds] = useState([]);
 
   useEffect(() => {
     let unsubscribeNotifications = null;
+    let active = true;
 
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (unsubscribeNotifications) {
         unsubscribeNotifications();
         unsubscribeNotifications = null;
       }
+
+      if (!active) return;
 
       setNotifications([]);
       setError("");
@@ -379,6 +152,8 @@ const [activeCategory, setActiveCategory] = useState("all");
       unsubscribeNotifications = onSnapshot(
         notificationsQuery,
         (snapshot) => {
+          if (!active) return;
+
           const items = snapshot.docs.map((item) =>
             normalizeNotification(item.id, item.data())
           );
@@ -395,13 +170,18 @@ const [activeCategory, setActiveCategory] = useState("all");
         },
         (err) => {
           console.error("Failed to load notifications:", err);
-          setError("Unable to load notifications. Check your connection and permissions.");
+          if (!active) return;
+
+          setError(
+            "Unable to load notifications. Check your connection and permissions."
+          );
           setLoading(false);
         }
       );
     });
 
     return () => {
+      active = false;
       unsubscribeAuth();
 
       if (unsubscribeNotifications) {
@@ -410,16 +190,13 @@ const [activeCategory, setActiveCategory] = useState("all");
     };
   }, []);
 
-  const categories = categoryDefinitions.map((category) => {
-    const count =
+  const categories = categoryDefinitions.map((category) => ({
+    ...category,
+    count:
       category.id === "all"
         ? notifications.length
-        : notifications.filter(
-            (item) => item.category === category.id
-          ).length;
-
-    return { ...category, count };
-  });
+        : notifications.filter((item) => item.category === category.id).length,
+  }));
 
   const filteredNotifications = notifications.filter(
     (notification) =>
@@ -427,83 +204,63 @@ const [activeCategory, setActiveCategory] = useState("all");
       notification.category === activeCategory
   );
 
-  const todayNotifications = filteredNotifications.filter((item) => {
-    if (!item.createdAt) return true;
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
 
-    const today = new Date();
-    return (
-      item.createdAt.getFullYear() === today.getFullYear() &&
-      item.createdAt.getMonth() === today.getMonth() &&
-      item.createdAt.getDate() === today.getDate()
-    );
-  });
+  const todayNotifications = filteredNotifications.filter(
+    (item) => item.createdAt && isSameCalendarDay(item.createdAt, today)
+  );
 
-  const yesterdayNotifications = filteredNotifications.filter((item) => {
-    if (!item.createdAt) return false;
+  const yesterdayNotifications = filteredNotifications.filter(
+    (item) => item.createdAt && isSameCalendarDay(item.createdAt, yesterday)
+  );
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    return (
-      item.createdAt.getFullYear() === yesterday.getFullYear() &&
-      item.createdAt.getMonth() === yesterday.getMonth() &&
-      item.createdAt.getDate() === yesterday.getDate()
-    );
-  });
-
-  const olderNotifications = filteredNotifications.filter((item) => {
-    if (!item.createdAt) return false;
-
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    const date = item.createdAt;
-
-    const isToday =
-      date.getFullYear() === today.getFullYear() &&
-      date.getMonth() === today.getMonth() &&
-      date.getDate() === today.getDate();
-
-    const isYesterday =
-      date.getFullYear() === yesterday.getFullYear() &&
-      date.getMonth() === yesterday.getMonth() &&
-      date.getDate() === yesterday.getDate();
-
-    return !isToday && !isYesterday;
-  });
+  // Notifications with missing/invalid timestamps are kept in the feed.
+  const olderNotifications = filteredNotifications.filter(
+    (item) =>
+      !item.createdAt ||
+      (!isSameCalendarDay(item.createdAt, today) &&
+        !isSameCalendarDay(item.createdAt, yesterday))
+  );
 
   async function markAsRead(notification) {
     if (!notification.unread || !userId) return;
 
+    setUpdatingIds((previous) =>
+      previous.includes(notification.id)
+        ? previous
+        : [...previous, notification.id]
+    );
+
     try {
-      await updateDoc(
-        doc(db, "notifications", notification.id),
-        { read: true }
-      );
+      await updateDoc(doc(db, "notifications", notification.id), {
+        read: true,
+      });
     } catch (err) {
       console.error("Failed to mark notification as read:", err);
       setError("Unable to update notification status.");
+    } finally {
+      setUpdatingIds((previous) =>
+        previous.filter((id) => id !== notification.id)
+      );
     }
   }
 
   async function markAllAsRead() {
     if (!userId || markingAll) return;
 
-    const unreadNotifications = notifications.filter(
-      (item) => item.unread
-    );
-
+    const unreadNotifications = notifications.filter((item) => item.unread);
     if (unreadNotifications.length === 0) return;
 
     setMarkingAll(true);
     setError("");
 
     try {
-      // Firestore write batches support at most 500 operations.
-      for (let i = 0; i < unreadNotifications.length; i += 500) {
+      // Firestore batches support at most 500 write operations.
+      for (let index = 0; index < unreadNotifications.length; index += 500) {
         const batch = writeBatch(db);
-        const chunk = unreadNotifications.slice(i, i + 500);
+        const chunk = unreadNotifications.slice(index, index + 500);
 
         chunk.forEach((item) => {
           batch.update(doc(db, "notifications", item.id), {
@@ -515,7 +272,7 @@ const [activeCategory, setActiveCategory] = useState("all");
       }
     } catch (err) {
       console.error("Failed to mark all notifications as read:", err);
-      setError("Unable to mark all notifications as read.");
+      setError("Unable to mark all notifications as read. Please try again.");
     } finally {
       setMarkingAll(false);
     }
@@ -524,18 +281,19 @@ const [activeCategory, setActiveCategory] = useState("all");
   async function handleNotificationClick(notification) {
     await markAsRead(notification);
 
-    if (notification.actionUrl) {
-      window.location.href = notification.actionUrl;
+    const actionUrl = getSafeActionUrl(notification.actionUrl);
+    if (actionUrl) {
+      window.location.assign(actionUrl);
     }
   }
 
   async function handleAction(notification, event) {
     event.stopPropagation();
-
     await markAsRead(notification);
 
-    if (notification.actionUrl) {
-      window.location.href = notification.actionUrl;
+    const actionUrl = getSafeActionUrl(notification.actionUrl);
+    if (actionUrl) {
+      window.location.assign(actionUrl);
     }
   }
 
@@ -545,16 +303,16 @@ const [activeCategory, setActiveCategory] = useState("all");
   }
 
   return (
-    <main className="resorts-page">
- 
- <main className="notifications-page">
+    <main className="notifications-page">
       <header className="mobile-notification-header">
         <span className="mobile-logo">LuxeStay</span>
 
         <button
+          type="button"
           className="mobile-menu-button"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          onClick={() => setSidebarOpen((open) => !open)}
           aria-label="Toggle notification categories"
+          aria-expanded={sidebarOpen}
         >
           <span className="material-symbols-outlined">
             {sidebarOpen ? "close" : "menu"}
@@ -563,9 +321,11 @@ const [activeCategory, setActiveCategory] = useState("all");
       </header>
 
       {sidebarOpen && (
-        <div
+        <button
+          type="button"
           className="notification-overlay"
           onClick={() => setSidebarOpen(false)}
+          aria-label="Close notification categories"
         />
       )}
 
@@ -574,44 +334,51 @@ const [activeCategory, setActiveCategory] = useState("all");
           <div>
             <h1>Notifications</h1>
             <p>
-              Stay updated on your reservations, account alerts,
-              and exclusive offers.
+              Stay updated on your reservations, account alerts, and exclusive
+              offers.
             </p>
           </div>
 
           <div className="notification-actions">
             <button
+              type="button"
               className="outline-button"
               onClick={markAllAsRead}
-              disabled={markingAll}
+              disabled={markingAll || !notifications.some((item) => item.unread)}
             >
               {markingAll ? "UPDATING..." : "MARK ALL AS READ"}
             </button>
 
             <button
+              type="button"
               className="outline-button filter-button"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={() => setSidebarOpen((open) => !open)}
+              aria-expanded={sidebarOpen}
             >
-              <span className="material-symbols-outlined">
-                filter_list
-              </span>
+              <span className="material-symbols-outlined">filter_list</span>
               FILTER
             </button>
           </div>
         </div>
 
-        {error && <p role="alert">{error}</p>}
+        {error && (
+          <p className="notification-error" role="alert">
+            {error}
+          </p>
+        )}
 
         <div className="notification-grid">
           <aside
             className={`notification-categories ${
               sidebarOpen ? "categories-open" : ""
             }`}
+            aria-label="Notification categories"
           >
             <div className="category-mobile-header">
               <span>Notification Categories</span>
 
               <button
+                type="button"
                 onClick={() => setSidebarOpen(false)}
                 aria-label="Close categories"
               >
@@ -621,21 +388,19 @@ const [activeCategory, setActiveCategory] = useState("all");
 
             {categories.map((category) => (
               <button
+                type="button"
                 key={category.id}
                 className={`category-button ${
                   activeCategory === category.id ? "active" : ""
-                } ${
-                  category.danger ? "danger-category" : ""
-                }`}
+                } ${category.danger ? "danger-category" : ""}`}
                 onClick={() => selectCategory(category.id)}
+                aria-pressed={activeCategory === category.id}
               >
                 <span className="material-symbols-outlined category-icon">
                   {category.icon}
                 </span>
 
-                <span className="category-label">
-                  {category.label}
-                </span>
+                <span className="category-label">{category.label}</span>
 
                 {category.danger ? (
                   <span className="category-danger-count">
@@ -643,15 +408,13 @@ const [activeCategory, setActiveCategory] = useState("all");
                     {category.count}
                   </span>
                 ) : (
-                  <span className="category-count">
-                    {category.count}
-                  </span>
+                  <span className="category-count">{category.count}</span>
                 )}
               </button>
             ))}
           </aside>
 
-          <section className="notification-feed">
+          <section className="notification-feed" aria-live="polite">
             {loading ? (
               <p>Loading notifications...</p>
             ) : filteredNotifications.length === 0 ? (
@@ -659,7 +422,6 @@ const [activeCategory, setActiveCategory] = useState("all");
                 <span className="material-symbols-outlined">
                   notifications_off
                 </span>
-
                 <h3>No notifications</h3>
                 <p>There are no notifications in this category.</p>
               </div>
@@ -668,11 +430,11 @@ const [activeCategory, setActiveCategory] = useState("all");
                 {todayNotifications.length > 0 && (
                   <>
                     <h2 className="notification-day">TODAY</h2>
-
                     {todayNotifications.map((notification) => (
                       <NotificationCard
                         key={notification.id}
                         notification={notification}
+                        updating={updatingIds.includes(notification.id)}
                         onClick={handleNotificationClick}
                         onAction={handleAction}
                       />
@@ -685,11 +447,11 @@ const [activeCategory, setActiveCategory] = useState("all");
                     <h2 className="notification-day yesterday-title">
                       YESTERDAY
                     </h2>
-
                     {yesterdayNotifications.map((notification) => (
                       <NotificationCard
                         key={notification.id}
                         notification={notification}
+                        updating={updatingIds.includes(notification.id)}
                         onClick={handleNotificationClick}
                         onAction={handleAction}
                       />
@@ -700,11 +462,11 @@ const [activeCategory, setActiveCategory] = useState("all");
                 {olderNotifications.length > 0 && (
                   <>
                     <h2 className="notification-day">EARLIER</h2>
-
                     {olderNotifications.map((notification) => (
                       <NotificationCard
                         key={notification.id}
                         notification={notification}
+                        updating={updatingIds.includes(notification.id)}
                         onClick={handleNotificationClick}
                         onAction={handleAction}
                       />
@@ -716,11 +478,6 @@ const [activeCategory, setActiveCategory] = useState("all");
           </section>
         </div>
       </div>
-    </main>
-    
-
-
-
 
       <footer className="resorts-footer">
         <p>
@@ -736,17 +493,31 @@ const [activeCategory, setActiveCategory] = useState("all");
   );
 }
 
-function NotificationCard({ notification, onClick, onAction }) {
+function NotificationCard({
+  notification,
+  updating,
+  onClick,
+  onAction,
+}) {
+  function handleKeyDown(event) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onClick(notification);
+    }
+  }
+
   return (
     <article
       className={`notification-card ${notification.type} ${
         notification.unread ? "unread" : "read"
       }`}
       onClick={() => onClick(notification)}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`${notification.title}. ${notification.message}`}
     >
-      {notification.unread && (
-        <div className="unread-indicator" />
-      )}
+      {notification.unread && <div className="unread-indicator" />}
 
       <div className="notification-inner">
         <div className="notification-icon">
@@ -758,26 +529,24 @@ function NotificationCard({ notification, onClick, onAction }) {
         <div className="notification-content">
           <div className="notification-title-row">
             <h3>{notification.title}</h3>
-            <span className="notification-time">
-              {notification.time}
-            </span>
+            <span className="notification-time">{notification.time}</span>
           </div>
 
-          <p className="notification-message">
-            {notification.message}
-          </p>
+          <p className="notification-message">{notification.message}</p>
 
           {notification.action && (
             <div className="notification-action">
               <button
+                type="button"
                 className={
                   notification.type === "error"
                     ? "review-button"
                     : "view-itinerary-button"
                 }
                 onClick={(event) => onAction(notification, event)}
+                disabled={updating}
               >
-                {notification.action}
+                {updating ? "UPDATING..." : notification.action}
               </button>
             </div>
           )}

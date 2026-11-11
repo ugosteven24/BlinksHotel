@@ -157,8 +157,8 @@ export default function Menu() {
             href="/dashboard/explore"
             className="header-explore-button"
           >
-            <span>Find a stay</span>
-            <ArrowUpRight size={17} />
+            <span className="lg: text-amber-50">Find a stay</span>
+            <ArrowUpRight size={17} className="lg: text-amber-50" />
           </Link>
 
           <div className="header-profile">
