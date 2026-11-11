@@ -172,7 +172,7 @@ export default function hotelsDestinations() {
                     {destinations.map((destination) => (
                         <Link
                             key={destination.city.toLowerCase()}
-                            href={`/search?destinationdetails=${encodeURIComponent(
+                            href={`/pages/destinationdetails?destination=${encodeURIComponent(
                                 destination.city
                             )}`}
                             className="group relative h-52 overflow-hidden rounded-xl shadow-md"
