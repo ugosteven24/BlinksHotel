@@ -1184,7 +1184,7 @@
 }
 
 .profile-page {
-  width: 100%;
+  width: auto;
   min-height: 100vh;
 
   padding: 48px;

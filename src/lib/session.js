@@ -13,7 +13,7 @@ import {
   createSessionToken,
   verifySessionToken,
 } from "@/lib/session-token";
-
+import {auth} from "@/firebase/firebase"
 // Google's public keys for Firebase ID tokens. jose caches them for us.
 // This replaces firebase-admin, which only verified the token and crashed
 // on Vercel (its jwks-rsa dependency require()s the ESM-only jose).
@@ -81,6 +81,16 @@ export async function createSession(idToken, remember = true) {
 }
 
 // READ the session. Returns { userId } or null.
+// export async function getCurrentUserStatus() {
+//   const currentuser= await auth.currentUser;
+//   if (!currentuser) {
+//     return null;
+//   }
+//   return { userId: currentuser.uid };
+// }
+
+// READ just the user id. Returns the id string or null.
+// READ the session. Returns { userId } or null.
 export async function getSession() {
   const cookieStore = await cookies();
   return verifySessionToken(cookieStore.get(SESSION_COOKIE)?.value);
@@ -91,9 +101,6 @@ export async function getUserId() {
   const session = await getSession();
   return session?.userId ?? null;
 }
-
-
-
 // Remove the session cookie (logout).
 export async function deleteSession() {
   const cookieStore = await cookies();

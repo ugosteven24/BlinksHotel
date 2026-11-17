@@ -1,13 +1,16 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+
 import Link from "next/link";
 import ProfileImage from "../dashboard/component/profileImage";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from "@/firebase/firebase";
-
+import { useEffect, useMemo, useState } from "react";
+import Swal from "sweetalert2";
+import {deleteSession} from "@/lib/session";
+import { onAuthStateChanged } from "firebase/auth";
 import {
   Waves,
   LayoutDashboard,
@@ -34,6 +37,40 @@ export default function Menu() {
   const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.replace("/login");
+        return;
+      }
+
+      try {
+        const snap = await getDocs(
+          query(collection(db, "bookings"), where("userId", "==", user.uid))
+        );
+
+        const list = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => createdMillis(b) - createdMillis(a));
+
+        setBookings(list);
+      } catch (err) {
+        console.error("Failed to load bookings:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Unable to load your bookings.",
+          confirmButtonColor: BUTTON_COLOR,
+        });
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    return () => unsub();
+  }, [router]);
+
+
+  useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
@@ -44,6 +81,7 @@ export default function Menu() {
 
     try {
       await signOut(auth);
+      await deleteSession();
       sessionStorage.clear();
       router.replace("/login");
       router.refresh();
@@ -144,22 +182,15 @@ export default function Menu() {
 
         {/* Header Actions */}
         <div className="header-actions">
-          <button
-            type="button"
-            className="header-search-button"
-            aria-label="Find hotels"
-            onClick={handleSearch}
-          >
-            <Search size={19} />
-          </button>
 
-          <Link
+
+          {/* <Link
             href="/dashboard/explore"
             className="header-explore-button"
           >
             <span className="lg: text-amber-50">Find a stay</span>
             <ArrowUpRight size={17} className="lg: text-amber-50" />
-          </Link>
+          </Link> */}
 
           <div className="header-profile">
             <div className="header-profile-image">

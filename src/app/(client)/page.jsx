@@ -357,19 +357,20 @@ export default function ResortsPage() {
           <button
             className="search-resorts-button"
             type="submit"
+          
             disabled={loading}
           >
             {loading ? (
               <>
-                <LoaderCircle
+                {/* <LoaderCircle
                   size={18}
                   className="animate-spin"
-                />
+                /> */}
                 Searching...
               </>
             ) : (
               <>
-                <Search size={18} />
+
                 Search Resorts
               </>
             )}
@@ -411,11 +412,14 @@ export default function ResortsPage() {
 
             {loading ? (
               <div className="no-resorts">
-                <LoaderCircle
-                  size={32}
-                  className="animate-spin"
-                />
-                <p>Searching hotels...</p>
+
+                <p className="justify-center">
+                  {/* <LoaderCircle
+                    size={32}
+                    className="animate-spin"
+                  /> */}
+                  Searching hotels...
+                </p>
               </div>
             ) : resorts.length > 0 ? (
               <div className="resorts-grid">

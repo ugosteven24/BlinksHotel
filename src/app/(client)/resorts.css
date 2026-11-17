@@ -170,6 +170,10 @@
     height: 49px;
     padding: 0 18px;
     white-space: nowrap;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    background-color: #0755c5;
     border-radius: 4px;
 }
 
