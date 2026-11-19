@@ -208,9 +208,9 @@
   align-items: center;
   justify-content: center;
   color: var(--menu-text);
-  background: #f4f6f9;
+  background: transparent;
   border: 1px solid var(--menu-border);
-  border-radius: 12px;
+  border-radius: 2px;
   cursor: pointer;
 }
 

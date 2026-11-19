@@ -163,10 +163,11 @@ export default function hotelsDestinations() {
                 <div className="grid grid-cols-2 gap-3 md:hidden">
                     {destinations.map((destination) => (
                         <Link
-                            key={destination.city.toLowerCase()}
-                            href={`/pages/destinationdetails?destination=${encodeURIComponent(
-                                destination.city
-                            )}`}
+                            // key={destination.city.toLowerCase()}
+                            // href={`/pages/destinationdetails?destination=${encodeURIComponent(
+                            //     destination.city
+                            // )}`}
+                            href={"/pages/categories/"}
                             className="group relative h-52 overflow-hidden rounded-1xl shadow-md"
                         >
                             {/* Cover image */}
