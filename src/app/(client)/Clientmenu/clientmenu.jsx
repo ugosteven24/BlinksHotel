@@ -6,7 +6,7 @@ import Link from "next/link";
 import ProfileImage from "../dashboard/component/profileImage";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
-import { auth } from "@/firebase/firebase";
+import { auth,getDocs} from "@/firebase/firebase";
 import { useEffect, useMemo, useState } from "react";
 import Swal from "sweetalert2";
 import {deleteSession} from "@/lib/session";
