@@ -77,29 +77,21 @@ export default function hotelsDestinations() {
     }, []);
 
     return (
-        <section className="mx-auto px-margin-mobile pb-16 pt-20 md:px-margin">
+        <section className="mx-auto px-margin-mobile pb-1 pt-5 md:px-margin">
             {/* Section heading */}
-            <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+            <div className="mb-6 flex flex-col justify-between gap-5 md:flex-row md:items-end">
                 <div className="max-w-3xl">
                     {/* Section label */}
-                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-blue-700">
-                        <span className="material-symbols-outlined text-[18px]">
-                            explore
-                        </span>
-
-                        <span className="text-[11px] font-bold uppercase tracking-[0.16em]">
-                            Curated Geographies
-                        </span>
-                    </div>
+                
 
                     {/* Heading */}
-                    <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-[42px]">
+                    <h2 className="text-3xl  font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-[42px]">
                         Where Will You {" "}
                         <span className="text-blue-600">Stay Next?</span>
                     </h2>
 
                     {/* Description */}
-                    <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base">
+                    <p className="mt-4 max-w-2xl font-light text-sm leading-5 text-slate-500 sm:text-base">
                         Discover remarkable places to stay, from vibrant city escapes
                         to peaceful retreats. Explore inspiring destinations, find
                         accommodation that suits your journey, and plan your next
@@ -110,9 +102,9 @@ export default function hotelsDestinations() {
 
             <Link
                 href="/pages/destinations"
-                className="inline-flex items-center gap-1 font-label-md text-primary transition-colors hover:opacity-75"
+                className="pb-2 inline-flex items-center gap-1 font-label-md text-primary transition-colors hover:opacity-75"
             >
-                <span>Explore all destinations</span>
+                <span className="font-extrabold">Explore all destinations</span>
 
                 <span className="material-symbols-outlined text-[18px]">
                     <ArrowRight size={20} />
@@ -123,7 +115,7 @@ export default function hotelsDestinations() {
             {/* Loading state */ }
     {
         loading && (
-            <div className="flex h-[300px] items-center justify-center">
+            <div className="flex h-[300px] items-center justify-center ">
                 <p className="text-text-secondary">
                     Loading destinations...
                 </p>

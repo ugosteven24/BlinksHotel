@@ -77,21 +77,13 @@ export default function PopularDestinations() {
     }, []);
 
     return (
-        <section className="mx-auto px-margin-mobile pb-16 pt-20 md:px-margin">
+        <section className="mx-auto px-margin-mobile pb-6 pt-5 md:px-margin">
             {/* Section heading */}
-            <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
                 <div>
-                    <div className="mb-2 inline-flex items-center gap-2 text-primary">
-                        <span className="material-symbols-outlined text-[18px]">
-                            explore
-                        </span>
+               
 
-                        <span className="font-label-md text-label-md">
-                            CURATED GEOGRAPHIES
-                        </span>
-                    </div>
-
-                    <h2 className="font-headline-lg text-headline-lg-mobile font-bold tracking-tight text-on-surface md:text-headline-lg">
+                    <h2 className="font-headline-lg text-2xl text-headline-lg-mobile font-bold tracking-tight text-on-surface md:text-headline-lg">
                         Explore Popular Destinations
                     </h2>
 

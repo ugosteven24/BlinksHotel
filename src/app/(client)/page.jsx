@@ -384,7 +384,7 @@ export default function ResortsPage() {
         )}
       </section>
 
-      <div className="px-5 lg:px-19">
+      <div className="px-3 lg:px-19">
 
         {/* Search results */}
         {hasSearched ? (
