@@ -77,9 +77,9 @@ export default function PopularDestinations() {
     }, []);
 
     return (
-        <section className="mx-auto px-margin-mobile pb-6 pt-5 md:px-margin">
+        <section className="mx-auto px-margin-mobile pb-1 pt-5 md:px-margin">
             {/* Section heading */}
-            <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div className="mb-1 flex flex-col justify-between gap-4 md:flex-row md:items-end">
                 <div>
                
 
@@ -87,7 +87,7 @@ export default function PopularDestinations() {
                         Explore Popular Destinations
                     </h2>
 
-                    <p className="mt-2 font-body-md text-body-md text-text-secondary">
+                    <p className="mt-1 font-body-md text-body-md text-text-secondary">
                         Discover popular places to stay and explore.
                     </p>
                 </div>

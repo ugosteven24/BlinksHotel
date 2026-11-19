@@ -35,11 +35,11 @@ const benefits = [
 export default function Accountintro() {
   return (
   
-<section className="bg-slate-50 px-5 py-16 md:px-10 lg:py-20">
+<section className="bg-slate-50 px-2 py-2 md:px-4 lg:py-20">
     <div className="mx-auto max-w-7xl">
 
         {/* ACCOUNT SECTION */}
-        <div className="border-b border-slate-200 pb-16">
+        <div className="border-b border-slate-200 pb-1">
 
             <div className="mb-8">
                 <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1.5 text-xs font-extrabold uppercase tracking-widest text-blue-700">

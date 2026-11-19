@@ -167,7 +167,7 @@ export default function hotelsDestinations() {
                             href={`/pages/destinationdetails?destination=${encodeURIComponent(
                                 destination.city
                             )}`}
-                            className="group relative h-52 overflow-hidden rounded-xl shadow-md"
+                            className="group relative h-52 overflow-hidden rounded-1xl shadow-md"
                         >
                             {/* Cover image */}
                             {destination.coverImage && (
